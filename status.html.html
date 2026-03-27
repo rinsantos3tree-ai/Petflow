@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PetFlow | Acompanhamento em Tempo Real</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+    <style>
+        :root { --p: #f97316; --bg: #020617; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        
+        body { 
+            background: #020617; 
+            color: white; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            min-height: 100vh; 
+            padding: 20px;
+            background: radial-gradient(circle at center, #0f172a, #020617);
+        }
+        
+        .container { width: 100%; max-width: 400px; text-align: center; animation: fadeIn 0.6s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .logo { font-size: 32px; font-weight: 800; margin-bottom: 5px; letter-spacing: -1px; }
+        .logo span { color: var(--p); }
+        .sub { font-size: 10px; color: #64748b; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 40px; font-weight: 600; }
+
+        .card { 
+            background: rgba(15, 23, 42, 0.4); 
+            border: 2px solid var(--p); 
+            border-radius: 45px; 
+            padding: 50px 25px; 
+            backdrop-filter: blur(15px);
+            box-shadow: 0 25px 60px rgba(0,0,0,0.4);
+            transition: border-color 0.5s ease;
+        }
+
+        .pet-nome { font-size: 48px; font-weight: 800; margin-bottom: 5px; letter-spacing: -1.5px; }
+        .pet-raca { color: #475569; font-size: 16px; margin-bottom: 35px; font-weight: 600; }
+
+        .status-badge { 
+            background: var(--p); 
+            color: white; 
+            padding: 22px; 
+            border-radius: 25px; 
+            font-weight: 800; 
+            font-size: 22px; 
+            text-transform: uppercase;
+            display: block;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 25px rgba(249, 115, 22, 0.2);
+            transition: all 0.5s ease;
+        }
+
+        .info-pill { 
+            background: rgba(255,255,255,0.04); 
+            padding: 18px; 
+            border-radius: 22px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 12px;
+            font-size: 14px;
+            color: #cbd5e1;
+            font-weight: 600;
+        }
+
+        .obs-box { margin-top: 20px; color: #64748b; font-size: 13px; font-style: italic; }
+        .footer-msg { margin-top: 40px; font-size: 11px; color: #334155; }
+    </style>
+</head>
+<body>
+
+<div class="container" id="loading">Aguardando dados...</div>
+
+<div class="container" id="app" style="display:none;">
+    <div class="logo">Pet<span>Flow</span></div>
+    <p class="sub">Acompanhamento em tempo real</p>
+    
+    <div class="card" id="cardBorda">
+        <h1 class="pet-nome" id="nomePet">---</h1>
+        <p class="pet-raca" id="racaPet">---</p>
+        
+        <div class="status-badge" id="statusBadge">---</div>
+        
+        <div class="info-pill">
+            <span id="servicoPet">---</span>
+            <span style="opacity: 0.2">|</span>
+            <span id="horarioPet">---</span>
+        </div>
+    </div>
+
+    <div class="obs-box" id="obsPet"></div>
+    <p class="footer-msg">Esta página se atualiza automaticamente conforme o serviço progride.</p>
+</div>
+
+<script>
+    // CONFIGURAÇÃO FIREBASE
+    const firebaseConfig = { 
+        apiKey: "AIzaSyAq4NH16AM80LjdfDSD53T1XtsurbCn98A", 
+        authDomain: "petflow-ia.firebaseapp.com", 
+        projectId: "petflow-ia" 
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    // PEGA O ID DO PET NA URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const petId = urlParams.get('id');
+
+    if (petId) {
+        db.collection("agendamentos").doc(petId).onSnapshot((doc) => {
+            if (doc.exists) {
+                const pet = doc.data();
+                atualizarTela(pet);
+            } else {
+                document.getElementById('loading').innerText = "Agendamento não encontrado.";
+            }
+        });
+    } else {
+        document.getElementById('loading').innerText = "Link inválido. Peça um novo link à petshop.";
+    }
+
+    function atualizarTela(pet) {
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('app').style.display = 'block';
+
+        document.getElementById('nomePet').innerText = pet.nome;
+        document.getElementById('racaPet').innerText = pet.raca;
+        document.getElementById('statusBadge').innerText = pet.txt;
+        document.getElementById('servicoPet').innerText = "✂️ " + pet.servico;
+        document.getElementById('horarioPet').innerText = "⏰ " + pet.horario;
+        document.getElementById('obsPet').innerText = pet.obs ? "Nota: " + pet.obs : "";
+
+        // Lógica de Cores baseada no status
+        let cor = "#f97316"; // Laranja (Espera)
+        if(pet.status === 'st-servico') cor = "#3b82f6"; // Azul (Em Serviço)
+        if(pet.status === 'st-pronto') cor = "#10b981"; // Verde (Pronto)
+
+        document.getElementById('cardBorda').style.borderColor = cor;
+        document.getElementById('statusBadge').style.backgroundColor = cor;
+        document.getElementById('statusBadge').style.boxShadow = `0 10px 25px ${cor}44`;
+    }
+</script>
+
+</body>
+</html>

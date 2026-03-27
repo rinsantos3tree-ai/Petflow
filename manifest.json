@@ -1,0 +1,15 @@
+{
+  "name": "PetFlow Pro | Gestão de Elite",
+  "short_name": "PetFlow",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#020617",
+  "theme_color": "#f97316",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/194/194279.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

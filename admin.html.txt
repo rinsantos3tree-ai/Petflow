@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PetFlow Pro | Gestão de Elite</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+    <style>
+        :root { --p: #f97316; --bg: #020617; --card: rgba(15, 23, 42, 0.5); --border: rgba(255, 255, 255, 0.1); --glass: blur(25px); }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; outline: none !important; -webkit-tap-highlight-color: transparent; }
+        body { background: radial-gradient(circle at top right, #1e293b, #020617); color: #f8fafc; min-height: 100vh; overflow-x: hidden; }
+        
+        .tela { display: none; min-height: 100vh; width: 100vw; padding: 20px; max-width: 500px; margin: 0 auto; animation: fadeIn 0.4s ease-out; }
+        .ativa { display: block !important; }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
+
+        .logo { font-size: 32px; font-weight: 800; text-align: center; letter-spacing: -1.5px; margin-bottom: 10px; }
+        .logo span { color: var(--p); text-shadow: 0 0 15px rgba(249,115,22,0.4); }
+        
+        .chart-container { background: var(--card); border: 1px solid var(--border); border-radius: 35px; padding: 25px 15px; margin-bottom: 15px; height: 180px; backdrop-filter: var(--glass); }
+        .metrics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+        .m-card { background: rgba(255,255,255,0.03); padding: 15px; border-radius: 22px; border: 1px solid var(--border); text-align: center; }
+        .m-card p { font-size: 10px; color: #64748b; font-weight: 800; text-transform: uppercase; margin-bottom: 5px; }
+        .m-card h4 { font-size: 18px; color: var(--p); font-weight: 800; }
+
+        .card { background: var(--card); border: 1px solid var(--border); border-radius: 35px; padding: 25px; margin-bottom: 20px; backdrop-filter: var(--glass); }
+        
+        input, select, textarea { width: 100%; padding: 18px; margin-bottom: 12px; background: rgba(0,0,0,0.4); border: 1px solid var(--border); border-radius: 20px; color: white; font-weight: 600; font-size: 15px; -webkit-appearance: none; }
+        input:focus { border-color: var(--p); }
+        input::placeholder { color: rgba(255,255,255,0.25); }
+
+        .btn-p { width: 100%; padding: 20px; border: none; border-radius: 22px; color: white; font-weight: 800; font-size: 14px; cursor: pointer; display: block; text-align: center; text-decoration: none; transition: 0.2s; box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
+        .btn-p:active { transform: scale(0.96); }
+        
+        .pet-card { background: rgba(15, 23, 42, 0.6); padding: 22px; border-radius: 30px; margin-top: 15px; border: 1px solid var(--border); position: relative; }
+        .status-badge { padding: 16px; border-radius: 20px; font-size: 12px; font-weight: 800; border: none; width: 100%; text-transform: uppercase; cursor: pointer; margin-bottom: 12px; }
+        .st-agendado { background: #1e293b; color: #94a3b8; }
+        .st-servico { background: #3b82f6; color: white; }
+        .st-pronto { background: #10b981; color: white; }
+
+        .busca-divisor { margin: 10px 0 25px 0; position: relative; }
+        .busca-divisor input { border-color: var(--p); background: rgba(249, 115, 22, 0.05); margin-bottom: 0; padding-left: 50px; }
+        .busca-divisor::before { content: '🔍'; position: absolute; left: 20px; top: 18px; font-size: 18px; opacity: 0.7; }
+
+        #modalExcluir { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); z-index: 10000; display: none; align-items: center; justify-content: center; padding: 25px; }
+        .modal-box { background: #0f172a; border: 1px solid var(--border); border-radius: 35px; padding: 30px; width: 100%; max-width: 350px; text-align: center; }
+
+        #toast { position: fixed; top: 25px; left: 50%; transform: translateX(-50%); padding: 15px 30px; border-radius: 20px; z-index: 10001; display: none; font-weight: 800; backdrop-filter: var(--glass); border: 1px solid var(--border); }
+    </style>
+</head>
+<body>
+
+<div id="toast"></div>
+
+<div id="modalExcluir">
+    <div class="modal-box">
+        <h2 style="margin-bottom: 10px; color: #ef4444;">Remover?</h2>
+        <p style="color: #94a3b8; margin-bottom: 25px; font-size: 14px;">Deseja cancelar o agendamento deste pet?</p>
+        <button class="btn-p" id="confirmarBtn" style="background: #ef4444; margin-bottom: 10px;">SIM, EXCLUIR</button>
+        <button class="btn-p" onclick="fecharModal()" style="background: transparent; border: 1px solid var(--border);">VOLTAR</button>
+    </div>
+</div>
+
+<div id="telaAcesso" class="tela">
+    <div class="card" style="margin-top: 50px; text-align: center;">
+        <div class="logo">Pet<span>Flow</span> Pro</div>
+        <p style="font-size: 13px; color: #94a3b8; font-weight: 600; margin-bottom: 25px; margin-top: -5px; line-height: 1.4;">
+            Sua agenda cheia, <br> sua gestão impecável.
+        </p>
+        
+        <input type="email" id="uEmail" placeholder="E-mail da empresa">
+        <input type="password" id="uSenha" placeholder="Senha">
+        
+        <button class="btn-p" style="background: linear-gradient(135deg, #f97316, #ea580c);" onclick="gerenciarAcesso()">ACESSAR PAINEL</button>
+        
+        <div style="display: flex; justify-content: space-between; margin-top: 25px; padding: 0 10px;">
+            <p onclick="esqueciSenha()" style="font-size:12px; color:gray; cursor:pointer;">Esqueci a senha</p>
+            <p onclick="toggleModo()" id="btnToggle" style="font-size:12px; color:var(--p); font-weight:800; cursor:pointer;">Criar empresa grátis</p>
+        </div>
+    </div>
+</div>
+
+<div id="telaDash" class="tela">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+        <div class="logo" style="margin:0; font-size:22px">Pet<span>Flow</span></div>
+        <button onclick="auth.signOut()" style="background:none; border:none; color:#ef4444; font-weight:800; font-size: 11px;">SAIR</button>
+    </div>
+
+    <div style="margin-bottom: 25px;">
+        <h2 id="saudacao" style="font-size: 18px; font-weight: 800; color: #f8fafc;">Olá!</h2>
+        <p id="fraseImpacto" style="font-size: 12px; color: #94a3b8; font-weight: 600; line-height: 1.4;"></p>
+    </div>
+
+    <div class="chart-container"><canvas id="graficoVendas"></canvas></div>
+    
+    <div class="metrics-grid">
+        <div class="m-card"><p>Hoje</p><h4 id="valFaturado">R$ 0,00</h4></div>
+        <div class="m-card"><p>Concluídos</p><h4 id="valConcluidos">0</h4></div>
+    </div>
+
+    <div class="card">
+        <h3 style="font-size: 14px; margin-bottom: 15px; color: var(--p);">📝 Novo Agendamento</h3>
+        <input type="text" id="pNome" placeholder="Nome do Pet">
+        <input type="text" id="pRaca" placeholder="Raça">
+        <select id="pServico">
+            <option value="" disabled selected>Serviço...</option>
+            <option value="Banho & Tosa">Banho & Tosa</option>
+            <option value="Somente Banho">Somente Banho</option>
+            <option value="Tosa Higiênica">Tosa Higiênica</option>
+            <option value="Corte de Unha">Corte de Unha</option>
+            <option value="Hidratação">Hidratação</option>
+            <option value="Hospedagem">Hospedagem</option>
+        </select>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px">
+            <input type="text" id="pHorario" placeholder="Horário" onfocus="(this.type='time')" onblur="if(!this.value)this.type='text'">
+            <input type="number" id="pValor" placeholder="Preço R$">
+        </div>
+        <input type="tel" id="pWhats" placeholder="WhatsApp">
+        <textarea id="pObs" placeholder="Observações..."></textarea>
+        <button class="btn-p" style="background: linear-gradient(135deg, #f97316, #ea580c);" onclick="addPet()">AGENDAR AGORA 🐾</button>
+    </div>
+
+    <div class="busca-divisor">
+        <input type="text" id="campoBusca" onkeyup="filtrar()" placeholder="Buscar pet por nome...">
+    </div>
+
+    <div id="lista"></div>
+</div>
+
+<script>
+    const firebaseConfig = { apiKey: "AIzaSyAq4NH16AM80LjdfDSD53T1XtsurbCn98A", authDomain: "petflow-ia.firebaseapp.com", projectId: "petflow-ia" };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth(); const db = firebase.firestore();
+    
+    let idParaExcluir = null;
+    let modoCad = false;
+    let chartObj;
+
+    function avisar(m, c="#10b981") { 
+        const t = document.getElementById('toast'); t.innerText=m; t.style.background=c; t.style.display='block'; 
+        setTimeout(()=>t.style.display='none', 3000); 
+    }
+
+    function configurarBoasVindas() {
+        const h = new Date().getHours();
+        const frases = [
+            "O sucesso é a soma de pequenos esforços diários.",
+            "Transforme cuidado em uma experiência de luxo.",
+            "Foque na excelência e o faturamento virá.",
+            "Organização é a chave para escalar seu negócio.",
+            "Mais um dia para elevar o nível da sua estética pet!"
+        ];
+        document.getElementById('saudacao').innerText = h < 12 ? "Bom dia! ☀️" : h < 18 ? "Boa tarde! 🔥" : "Boa noite! 🌙";
+        document.getElementById('fraseImpacto').innerText = frases[Math.floor(Math.random() * frases.length)];
+    }
+
+    async function esqueciSenha() {
+        const e = document.getElementById('uEmail').value;
+        if(!e) return avisar("Digite seu e-mail acima primeiro", "#ef4444");
+        auth.sendPasswordResetEmail(e).then(() => avisar("E-mail enviado!")).catch(() => avisar("Erro","#ef4444"));
+    }
+
+    function toggleModo() { modoCad = !modoCad; document.getElementById('btnToggle').innerText = modoCad ? "Já tenho conta" : "Criar empresa grátis"; }
+
+    async function gerenciarAcesso() {
+        const e=document.getElementById('uEmail').value, s=document.getElementById('uSenha').value;
+        try { if(modoCad) await auth.createUserWithEmailAndPassword(e,s); else await auth.signInWithEmailAndPassword(e,s); } 
+        catch(err) { avisar("Erro no acesso","#ef4444"); }
+    }
+
+    function abrirModal(id) { idParaExcluir = id; document.getElementById('modalExcluir').style.display = 'flex'; }
+    function fecharModal() { document.getElementById('modalExcluir').style.display = 'none'; }
+
+    document.getElementById('confirmarBtn').onclick = async () => {
+        if(idParaExcluir) { await db.collection("agendamentos").doc(idParaExcluir).delete(); fecharModal(); avisar("Removido!", "#ef4444"); }
+    };
+
+    function filtrar() {
+        const termo = document.getElementById('campoBusca').value.toLowerCase();
+        document.querySelectorAll('.pet-item').forEach(i => { i.style.display = i.dataset.nome.toLowerCase().includes(termo) ? 'block' : 'none'; });
+    }
+
+    async function addPet() {
+        const inputH = document.getElementById('pHorario');
+        const n=document.getElementById('pNome').value, h=inputH.value;
+        if(!n || !h) return avisar("Preencha Nome e Hora","#ef4444");
+        await db.collection("agendamentos").add({
+            uid: auth.currentUser.uid, nome: n, raca: document.getElementById('pRaca').value || "SRD",
+            servico: document.getElementById('pServico').value || "Serviço Geral", horario: h,
+            valor: parseFloat(document.getElementById('pValor').value) || 0,
+            whats: document.getElementById('pWhats').value.replace(/\D/g,''),
+            obs: document.getElementById('pObs').value || "", status: 'st-agendado', txt: 'Agendado', criado: Date.now(), dataSimples: new Date().toLocaleDateString()
+        });
+        avisar("Pet Agendado!");
+        document.querySelectorAll('input, select, textarea').forEach(i => i.value = '');
+        inputH.type = 'text';
+    }
+
+    function carregar(uid) {
+        db.collection("agendamentos").where("uid", "==", uid).onSnapshot(snap => {
+            let html="", fatDia=0, petsDia=0, hist={}, arr=[];
+            const hoje = new Date().toLocaleDateString();
+            snap.forEach(doc => arr.push({id: doc.id, ...doc.data()}));
+            arr.sort((a,b) => (a.horario||"").localeCompare(b.horario||""));
+            arr.forEach(d => {
+                if(d.status === 'st-pronto' && d.dataSimples === hoje) { fatDia += d.valor; petsDia++; }
+                if(d.status === 'st-pronto') hist[d.dataSimples] = (hist[d.dataSimples] || 0) + d.valor;
+                const link = `https://petflow.vercel.app/status.html?id=${d.id}`;
+
+
+
+                const msg = encodeURIComponent(`Olá! Acompanhe o status do serviço do ${d.nome} aqui: ${link}`);
+                
+                // BLOCO DE OBSERVAÇÃO ADICIONADO ABAIXO
+                let obsHtml = d.obs ? `<p style="color: #94a3b8; font-size: 11px; margin-bottom: 12px; background: rgba(0,0,0,0.2); padding: 8px; border-radius: 10px;">📝 ${d.obs}</p>` : "";
+
+                html += `<div class="pet-card pet-item" data-nome="${d.nome}">
+                    <button style="position:absolute; right:20px; color:#ef4444; border:none; background:none; font-weight:800; font-size:22px;" onclick="abrirModal('${d.id}')">✕</button>
+                    <small style="color:var(--p); font-weight:800;">⏰ ${d.horario}</small>
+                    <h3 style="margin:5px 0;">${d.nome} <small style="color:gray; font-size:12px">(${d.raca})</small></h3>
+                    <p style="color: #64748b; font-size: 11px; font-weight: 700; margin-bottom: 8px;">🛠 ${d.servico}</p>
+                    ${obsHtml}
+                    <button class="status-badge ${d.status}" onclick="mudarStatus('${d.id}','${d.status}')">${d.txt}</button>
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                        <a href="https://wa.me/55${d.whats}" target="_blank" class="btn-p" style="background:#10b981; padding:15px; box-shadow:none;">WHATSAPP</a>
+                        <a href="https://wa.me/55${d.whats}?text=${msg}" target="_blank" class="btn-p" style="background:#3b82f6; padding:15px; box-shadow:none;">STATUS ONLINE</a>
+                    </div>
+                </div>`;
+            });
+            document.getElementById('valFaturado').innerText = `R$ ${fatDia.toFixed(2)}`;
+            document.getElementById('valConcluidos').innerText = petsDia;
+            document.getElementById('lista').innerHTML = html || "<p style='text-align:center; color:gray; padding:20px;'>Lista vazia.</p>";
+            renderGrafico(hist);
+        });
+    }
+
+    function mudarStatus(id, s) {
+        const ciclo = { 'st-agendado':['st-servico','Em Serviço'], 'st-servico':['st-pronto','Pronto!'], 'st-pronto':['st-agendado','Agendado'] };
+        db.collection("agendamentos").doc(id).update({ status: ciclo[s][0], txt: ciclo[s][1] });
+    }
+
+    function renderGrafico(h) {
+        const ctx = document.getElementById('graficoVendas').getContext('2d');
+        const labels = Object.keys(h).sort().slice(-7);
+        if(chartObj) chartObj.destroy();
+        chartObj = new Chart(ctx, { type: 'line', data: { labels, datasets: [{ data: labels.map(l=>h[l]), borderColor: '#f97316', borderWidth: 3, tension: 0.4, fill: true, backgroundColor: 'rgba(249, 115, 22, 0.1)' }] }, options: { maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { grid: { display: false }, ticks: { color: '#64748b', font: {size: 10, weight: '700'} } } } } });
+    }
+
+    auth.onAuthStateChanged(u => {
+        document.querySelectorAll('.tela').forEach(t => t.classList.remove('ativa'));
+        if(u) { document.getElementById('telaDash').classList.add('ativa'); configurarBoasVindas(); carregar(u.uid); } 
+        else { document.getElementById('telaAcesso').classList.add('ativa'); }
+    });
+</script>
+</body>
+</html>
