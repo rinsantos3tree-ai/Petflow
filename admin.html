@@ -209,7 +209,8 @@
             arr.forEach(d => {
                 if(d.status === 'st-pronto' && d.dataSimples === hoje) { fatDia += d.valor; petsDia++; }
                 if(d.status === 'st-pronto') hist[d.dataSimples] = (hist[d.dataSimples] || 0) + d.valor;
-                const link = `https://petflow.vercel.app/status.html?id=${d.id}`;
+                const link = `https://petflow-six.vercel.app/status.html?id=${d.id}`;
+
 
 
 
