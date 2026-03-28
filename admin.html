@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PetFlow Pro | Gestão de Elite</title>
+    <title>Petxus Pro | Gestão de Elite</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -67,7 +67,7 @@
 
 <div id="telaAcesso" class="tela">
     <div class="card" style="margin-top: 50px; text-align: center;">
-        <div class="logo">Pet<span>Flow</span> Pro</div>
+        <div class="logo">Pet<span>xus</span> Pro</div>
         <p style="font-size: 13px; color: #94a3b8; font-weight: 600; margin-bottom: 25px; margin-top: -5px; line-height: 1.4;">
             Sua agenda cheia, <br> sua gestão impecável.
         </p>
@@ -209,7 +209,7 @@
             arr.forEach(d => {
                 if(d.status === 'st-pronto' && d.dataSimples === hoje) { fatDia += d.valor; petsDia++; }
                 if(d.status === 'st-pronto') hist[d.dataSimples] = (hist[d.dataSimples] || 0) + d.valor;
-                const link = `https://petflow-six.vercel.app/status.html?id=${d.id}`;
+                const link = `https://petxus-six.vercel.app/status.html?id=${d.id}`;
 
 
 
