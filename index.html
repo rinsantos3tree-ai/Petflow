@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Petxus Pro | Gestão de Elite</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
+
     <style>
         :root { --p: #f97316; --p-glow: 0 0 25px rgba(249, 115, 22, 0.5); --bg: #020617; --card: rgba(15, 23, 42, 0.7); --border: rgba(255, 255, 255, 0.1); }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
@@ -35,16 +40,45 @@
 
         /* GRID DE FUNÇÕES */
         .grid-funcoes { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 40px 0; }
-        .funcao-card { background: var(--card); border: 1px solid var(--border); padding: 25px; border-radius: 25px; text-align: left; backdrop-filter: blur(10px); }
+        .funcao-card { 
+    background: rgba(255, 255, 255, 0.03); 
+    backdrop-filter: blur(10px); 
+    border: 1px solid rgba(255, 255, 255, 0.1); 
+    padding: 25px; 
+    border-radius: 20px; 
+    text-align: left; 
+    transition: 0.3s;
+}
+.funcao-card:hover { border-color: var(--p); transform: translateY(-5px); }
+
         .funcao-card h3 { color: var(--p); font-size: 16px; margin-bottom: 8px; font-weight: 800; }
         .funcao-card p { font-size: 13px; color: #94a3b8; line-height: 1.5; }
 
         /* DEPOIMENTOS */
-        .depo-card { background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 30px; padding: 30px; margin-bottom: 20px; text-align: left; }
-        .stars { color: #facc15; margin-bottom: 10px; font-size: 14px; }
-        .depo-text { font-style: italic; font-size: 15px; margin-bottom: 20px; line-height: 1.6; }
-        .depo-autor { display: flex; align-items: center; gap: 12px; }
-        .depo-autor img { width: 45px; height: 45px; border-radius: 50%; border: 2px solid var(--p); }
+       .swiper { width: 100%; padding-bottom: 50px !important; }
+
+.depo-card { 
+    background: rgba(255, 255, 255, 0.03); 
+    border: 1px solid rgba(255, 255, 255, 0.1); 
+    border-radius: 25px; 
+    padding: 30px; 
+    text-align: left;
+    backdrop-filter: blur(10px);
+    height: auto;
+    margin: 10px;
+}
+
+.depo-autor { display: flex; align-items: center; gap: 15px; margin-top: 20px; }
+.depo-autor img { width: 50px; height: 50px; border-radius: 50%; border: 2px solid var(--p); }
+.depo-autor strong { font-size: 15px; display: block; }
+.depo-autor span { font-size: 12px; color: #94a3b8; }
+
+.depo-autor span { font-size: 12px; color: #94a3b8; display: block; }
+
+
+/* Cor dos pontinhos do slide */
+.swiper-pagination-bullet { background: #fff !important; opacity: 0.3; }
+.swiper-pagination-bullet-active { background: var(--p) !important; opacity: 1; }
 
         /* PERGUNTAS (FAQ) */
         .faq-item { background: var(--card); border: 1px solid var(--border); border-radius: 15px; margin-bottom: 10px; text-align: left; overflow: hidden; }
@@ -54,6 +88,7 @@
         .faq-item.active .faq-question { color: var(--p); }
 
         /* OFERTA MELHORADA */
+        
         .oferta-box { background: linear-gradient(145deg, #1e293b, #0f172a); border: 2px solid var(--p); border-radius: 40px; padding: 80px 30px; margin: 60px 0; box-shadow: var(--p-glow); position: relative; }
         .badge { position: absolute; top: -25px; left: 50%; transform: translateX(-50%); background: #10b981; color: white; padding: 10px 30px; border-radius: 50px; font-weight: 800; font-size: 14px; box-shadow: 0 4px 10px rgba(16, 185, 129, 0.4); }
         .price-label { font-size: 14px; color: #94a3b8; text-decoration: line-through; margin-bottom: -5px; display: block; }
@@ -65,9 +100,51 @@
         @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
 
         /* NOTIFICAÇÃO AO VIVO */
-        #live-purchase { position: fixed; bottom: 20px; left: 20px; background: rgba(15, 23, 42, 0.95); border: 1px solid var(--p); padding: 15px 25px; border-radius: 20px; display: flex; align-items: center; gap: 15px; font-size: 12px; transform: translateX(-150%); transition: 0.6s; z-index: 9999; }
+        #live-purchase { 
+    position: fixed; 
+    bottom: 20px; 
+    left: 20px; 
+    background: rgba(15, 23, 42, 0.95); 
+    border: 1px solid var(--p); 
+    padding: 15px 20px; 
+    border-radius: 20px; 
+    display: flex; 
+    align-items: center; 
+    gap: 12px; 
+    font-size: 13px; /* Aumentei um tiquinho para ler melhor */
+    transform: translateX(-150%); 
+    transition: 0.6s; 
+    z-index: 9999; 
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
 
         footer { padding: 60px 20px; border-top: 1px solid var(--border); color: #475569; font-size: 11px; }
+        /* BOTÃO FLUTUANTE WHATSAPP */
+.wa-float {
+    position: fixed;
+    bottom: 25px;
+    right: 25px;
+    background-color: #25d366;
+    color: #FFF;
+    border-radius: 50px;
+    text-align: center;
+    font-size: 30px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    z-index: 1000;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    transition: 0.3s;
+}
+
+.wa-float:hover {
+    transform: scale(1.1);
+    background-color: #128c7e;
+}
+
     </style>
 </head>
 <body>
@@ -81,7 +158,12 @@
     <div class="sql-counter">⚡ <span id="lojas-ativas">142</span> LOJAS ATIVAS NO SISTEMA AGORA</div>
 
     <h1>O Seu Pet Shop no <span>Próximo Nível</span>.</h1>
-    <div class="vsl-box"><p style="color: #475569;">[ VÍDEO DO MARCUS ]</p></div>
+    <div class="vsl-box" style="background: url('link-da-sua-imagem.jpg') center/cover; cursor: pointer;" onclick="window.location.href='SEU_LINK_DA_KIWIFY'">
+    <div style="background: rgba(0,0,0,0.4); width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; border-radius: 30px;">
+         <i class="fa-solid fa-play" style="font-size: 60px; color: white; opacity: 0.8;"></i>
+    </div>
+</div>
+
 
     <div class="comparison-grid">
         <div class="comp-card antes">
@@ -100,26 +182,72 @@
         <div class="funcao-card"><h3>📅 Agenda Pro</h3><p>Organize banho e tosa em segundos, sem furos ou atrasos.</p></div>
         <div class="funcao-card"><h3>📋 Prontuário Pet</h3><p>Histórico completo, alergias e preferências de cada animal.</p></div>
     </div>
+<h2 style="margin: 60px 0 30px;">O que dizem os donos de Pet Shop:</h2>
 
-    <h2 style="margin: 40px 0 20px;">O que dizem os donos de Pet Shop:</h2>
-    <div class="depo-card">
-        <div class="stars">★★★★★</div>
-        <p class="depo-text">"O Status Online virou febre aqui no bairro. Meus clientes pedem o link e postam no Instagram. Meu faturamento subiu só pela indicação!"</p>
-        <div class="depo-autor"><img src="https://i.pravatar.cc/100?u=12" alt="Ana"><strong>Ana Paula - Estética Pet</strong></div>
-    </div>
-    <div class="depo-card">
-        <div class="stars">★★★★★</div>
-        <p class="depo-text">"Eu vivia perdendo dinheiro por não anotar tudo. Agora, cada banho eu lanço no sistema e no fim do dia o fechamento é perfeito."</p>
-        <div class="depo-autor"><img src="https://i.pravatar.cc/100?u=18" alt="Jorge"><strong>Jorge Luiz - Banho e Tosa</strong></div>
-    </div>
-    <div class="depo-card">
-        <div class="stars">★★★★★</div>
-        <p class="depo-text">"O melhor custo-benefício que já encontrei. Organizei meu financeiro e agora sei exatamente quanto coloco no bolso todo mês."</p>
-        <div class="depo-autor"><img src="https://i.pravatar.cc/100?u=22" alt="Bia"><strong>Beatriz Souza - Love Pets</strong></div>
-    </div>
+<div class="swiper meuCarrossel">
+    
+           <div class="swiper-slide">
+            <div class="depo-card">
+                <div class="stars">★★★★★</div>
+                <p class="depo-text">"O Status Online virou febre aqui. Meus clientes postam no Instagram e meu faturamento subiu só por indicação!"</p>
+                <div class="depo-autor">
+                    <img src="https://i.pravatar.cc/100?u=12" alt="Ana">
+                    <div><strong>Ana Paula</strong><span>Estética Pet</span></div>
+                </div>
+            </div>
+        </div>
 
-    <div style="margin: 60px 0; text-align: left;">
-        <h2 style="text-align: center; margin-bottom: 35px; font-size: 28px; font-weight: 800;">Dúvidas Frequentes</h2>
+        <div class="swiper-slide">
+            <div class="depo-card">
+                <div class="stars">★★★★★</div>
+                <p class="depo-text">"Eu vivia perdendo dinheiro por não anotar tudo. Agora o fechamento do dia é perfeito e rápido com o Petxus."</p>
+                <div class="depo-autor">
+                    <img src="https://i.pravatar.cc/100?u=18" alt="Jorge">
+                    <div><strong>Jorge Luiz</strong><span>Banho e Tosa VIP</span></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="swiper-slide">
+            <div class="depo-card">
+                <div class="stars">★★★★★</div>
+                <p class="depo-text">"Melhor custo-benefício. Organizei meu financeiro e agora sei exatamente quanto coloco no bolso todo mês."</p>
+                <div class="depo-autor">
+                    <img src="https://i.pravatar.cc/100?u=22" alt="Bia">
+                    <div><strong>Beatriz Souza</strong><span>Love Pets</span></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="swiper-slide">
+            <div class="depo-card">
+                <div class="stars">★★★★★</div>
+                <p class="depo-text">"O que eu levava 1 hora para fechar no caixa, agora faço em 5 minutos. O sistema calcula tudo sozinho."</p>
+                <div class="depo-autor">
+                    <img src="https://i.pravatar.cc/100?u=31" alt="Ricardo">
+                    <div><strong>Ricardo M.</strong><span>Pet Shop AuAu</span></div>
+                </div>
+            </div>
+        </div>
+
+                <div class="swiper-slide">
+            <div class="depo-card">
+                <div class="stars">★★★★★</div>
+                <p class="depo-text">"Acabou o problema de esquecer o que o cliente pediu. No prontuário fica tudo salvo e o cliente sente que é VIP."</p>
+                <div class="depo-autor">
+                    <img src="https://i.pravatar.cc/100?u=44" alt="Carla">
+                    <div><strong>Carla Dias</strong><span>Cantinho do Pet</span></div>
+                </div>
+            </div>
+        </div>
+
+            </div> 
+    
+    <div class="swiper-pagination"></div> 
+</div> <div class="faq-container" style="margin-top: 60px;">
+    <h2 style="text-align: center; margin-bottom: 35px; font-size: 28px; font-weight: 800;">Dúvidas Frequentes</h2>
+
+
         <div class="faq-item">
             <div class="faq-question">Como funciona o teste de 7 dias grátis?</div>
             <div class="faq-answer">Você libera seu acesso agora sem pagar nada. Se em até 7 dias você decidir que o sistema não é para você, basta cancelar e nada será cobrado.</div>
@@ -149,6 +277,11 @@
             <div class="faq-answer">Nenhuma. A assinatura é mensal e você pode cancelar quando quiser, sem letras miúdas ou taxas extras.</div>
         </div>
     </div>
+    <div style="margin: 30px 0; padding: 25px; border: 1px dashed #10b981; border-radius: 20px; background: rgba(16, 185, 129, 0.05); text-align: center;">
+    <strong style="color: #10b981; display: block; margin-bottom: 5px; font-size: 18px;">🛡️ RISCO ZERO: 7 DIAS DE GARANTIA</strong>
+    <p style="font-size: 14px; color: #94a3b8;">Teste o sistema hoje. Se não gostar, devolvemos seu dinheiro na hora. Sem burocracia.</p>
+</div>
+
 
     <div class="oferta-box">
         <div class="badge">CONDIÇÃO ÚNICA: 7 DIAS GRÁTIS 🚀</div>
@@ -163,7 +296,13 @@
     </div>
 
     <footer>
-        <p>PETXUS PRO © 2026 - GESTÃO PARA PET SHOPS</p>
+        <div class="footer-block footer-legal">
+    <p><strong>PETXUS PRO ® 2026</strong></p>
+    <p>Desenvolvido para transformar a gestão de Pet Shops no Brasil.</p>
+    <p>Dúvidas ou Suporte? Fale conosco pelo WhatsApp abaixo.</p>
+    <p style="margin-top: 10px; font-size: 11px; opacity: 0.6;">A plataforma Petxus Pro segue as normas de proteção de dados e privacidade.</p>
+</div>
+
         <br>
         <a href="https://wa.me/5522998421222?text=Olá!%20Gostaria%20de%20tirar%20uma%20dúvida%20sobre%20o%20Petxus%20Pro" style="color: #10b981; text-decoration: none; font-weight: 800; border: 1px solid #10b981; padding: 10px 20px; border-radius: 50px; display: inline-block;">💬 Suporte via WhatsApp</a>
 
@@ -177,17 +316,22 @@
 
 <script>
     // TIMER DE URGÊNCIA (10 MINUTOS)
-    function startTimer(duration, display) {
-        var timer = duration, minutes, seconds;
-        setInterval(function () {
-            minutes = parseInt(timer / 60, 10);
-            seconds = parseInt(timer % 60, 10);
-            minutes = minutes < 10 ? "0" + minutes : minutes;
-            seconds = seconds < 10 ? "0" + seconds : seconds;
-            display.textContent = minutes + ":" + seconds;
-            if (--timer < 0) { timer = duration; }
-        }, 1000);
+     function startTimer(duration, display) {
+    let startTime = localStorage.getItem('petxus_time');
+    if (!startTime) {
+        startTime = Date.now();
+        localStorage.setItem('petxus_time', startTime);
     }
+
+    setInterval(function () {
+        let elapsed = Math.floor((Date.now() - startTime) / 1000);
+        let remaining = duration - (elapsed % duration);
+        let mins = Math.floor(remaining / 60);
+        let secs = remaining % 60;
+        display.textContent = (mins < 10 ? "0" + mins : mins) + ":" + (secs < 10 ? "0" + secs : secs);
+    }, 1000);
+}
+
     window.onload = function () {
         var tenMinutes = 60 * 10,
         display = document.querySelector('#timer');
@@ -208,15 +352,43 @@
     setInterval(() => { count += 1; document.getElementById('lojas-ativas').innerText = count; }, 20000);
 
     // COMPRA AO VIVO
-    const lojas = ["Rei dos Pets", "Pet do Vale", "Amigo Fiel", "Estética Canina", "Banho e Tosa VIP"];
+        // COMPRA AO VIVO COM REGIÃO
+    const lojas = [
+        { nome: "Rei dos Pets", local: "Rio de Janeiro/RJ" },
+        { nome: "Pet do Vale", local: "São José dos Campos/SP" },
+        { nome: "Amigo Fiel", local: "Curitiba/PR" },
+        { nome: "Estética Canina", local: "Goiânia/GO" },
+        { nome: "Banho e Tosa VIP", local: "Salvador/BA" },
+        { nome: "Pet Shop AuAu", local: "Belo Horizonte/MG" },
+        { nome: "Cantinho do Pet", local: "Fortaleza/CE" },
+        { nome: "Love Pets", local: "Porto Alegre/RS" }
+    ];
+
     function showPurchase() {
-        document.getElementById('purchase-text').innerText = `A loja ${lojas[Math.floor(Math.random()*lojas.length)]} acaba de assinar!`;
+        const lojaAleatoria = lojas[Math.floor(Math.random() * lojas.length)];
+        // Aqui a mágica acontece: Nome da Loja + Localização
+        document.getElementById('purchase-text').innerHTML = `A loja <strong>${lojaAleatoria.nome}</strong> (${lojaAleatoria.local}) acaba de assinar!`;
+        
         const div = document.getElementById('live-purchase');
         div.style.transform = "translateX(0)";
         setTimeout(() => div.style.transform = "translateX(-150%)", 4500);
     }
+
     setInterval(showPurchase, 15000);
     setTimeout(showPurchase, 4000);
+    const swiper = new Swiper('.meuCarrossel', {
+    slidesPerView: 1,
+    spaceBetween: 20,
+    loop: true,
+    autoplay: { delay: 4000 },
+    pagination: { el: '.swiper-pagination', clickable: true },
+    breakpoints: { 768: { slidesPerView: 2 } }
+});
+
 </script>
+    <a href="https://wa.me/5522998421222" class="wa-float" target="_blank">
+    <i class="fa-brands fa-whatsapp"></i>
+</a>
+
 </body>
 </html>
