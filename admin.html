@@ -265,11 +265,12 @@
     });
 
     // 2. FUNÇÃO DE RECUPERAR SENHA (Global para o botão funcionar)
-    window.recuperarsenha = function() {
+       window.recuperarsenha = function() {
         var email = document.getElementById('uEmail').value;
 
         if (!email) {
-            alert("Por favor, digite seu e-mail no campo acima primeiro.");
+            // Usa o seu aviso visual em vez do alert feio
+            avisar("Digite seu e-mail no campo acima primeiro.", "#ef4444");
             return;
         }
 
@@ -280,13 +281,15 @@
 
         firebase.auth().sendPasswordResetEmail(email, actionCodeSettings)
             .then(function() {
-                alert("Sucesso! O link de redefinição foi enviado para o seu e-mail.");
+                // Mensagem de sucesso elegante
+                avisar("Sucesso! Verifique seu e-mail.", "#10b981");
             })
             .catch(function(error) {
                 console.error("Erro:", error.code);
-                alert("Erro ao enviar: Verifique se o e-mail está correto.");
+                avisar("Erro: E-mail não encontrado.", "#ef4444");
             });
     };
+
 
 </script>
 </body>
