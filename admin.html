@@ -78,7 +78,7 @@
         <button class="btn-p" style="background: linear-gradient(135deg, #f97316, #ea580c);" onclick="gerenciarAcesso()">ACESSAR PAINEL</button>
         
         <div style="display: flex; justify-content: space-between; margin-top: 25px; padding: 0 10px;">
-            <p onclick="recuperar senha()" style="font-size:12px; color:gray; cursor:pointer;">Esqueci a senha</p>
+            <p onclick="recuperarsenha()" style="font-size:12px; color:gray; cursor:pointer;">Esqueci a senha</p>
             <p onclick="toggleModo()" id="btnToggle" style="font-size:12px; color:var(--p); font-weight:800; cursor:pointer;">Criar empresa grátis</p>
         </div>
     </div>
@@ -158,12 +158,7 @@
         document.getElementById('fraseImpacto').innerText = frases[Math.floor(Math.random() * frases.length)];
     }
 
-    async function esqueciSenha() {
-        const e = document.getElementById('uEmail').value;
-        if(!e) return avisar("Digite seu e-mail acima primeiro", "#ef4444");
-        auth.sendPasswordResetEmail(e).then(() => avisar("E-mail enviado!")).catch(() => avisar("Erro","#ef4444"));
-    }
-
+  
     function toggleModo() { modoCad = !modoCad; document.getElementById('btnToggle').innerText = modoCad ? "Já tenho conta" : "Criar empresa grátis"; }
 
     async function gerenciarAcesso() {
@@ -257,33 +252,41 @@
         if(u) { document.getElementById('telaDash').classList.add('ativa'); configurarBoasVindas(); carregar(u.uid); } 
         else { document.getElementById('telaAcesso').classList.add('ativa'); }
     });
-function esqueci a senha() {
-    // 1. Pegue o email do seu input (verifique se o ID está correto)
-    var email = document.getElementById('uEmail').value;
+    // 1. MONITOR DE ACESSO (Onde o sistema decide qual tela mostrar)
+    auth.onAuthStateChanged(u => {
+        document.querySelectorAll('.tela').forEach(t => t.classList.remove('ativa'));
+        if(u) { 
+            document.getElementById('telaDash').classList.add('ativa'); 
+            configurarBoasVindas(); 
+            carregar(u.uid); 
+        } else { 
+            document.getElementById('telaAcesso').classList.add('ativa'); 
+        }
+    });
 
-    if (!email) {
-        alert("Por favor, digite seu e-mail.");
-        return;
-    }
+    // 2. FUNÇÃO DE RECUPERAR SENHA (Global para o botão funcionar)
+    window.recuperarsenha = function() {
+        var email = document.getElementById('uEmail').value;
 
-    // 2. Aqui você força o redirecionamento para sua página nova
-    var actionCodeSettings = {
-        // A URL da sua página que você subiu no GitHub
-        url: 'https://petxus.vercel.app/reset-password.html',
-        handleCodeInApp: true
+        if (!email) {
+            alert("Por favor, digite seu e-mail no campo acima primeiro.");
+            return;
+        }
+
+        var actionCodeSettings = {
+            url: 'https://petxus.vercel.app/reset-password.html',
+            handleCodeInApp: true
+        };
+
+        firebase.auth().sendPasswordResetEmail(email, actionCodeSettings)
+            .then(function() {
+                alert("Sucesso! O link de redefinição foi enviado para o seu e-mail.");
+            })
+            .catch(function(error) {
+                console.error("Erro:", error.code);
+                alert("Erro ao enviar: Verifique se o e-mail está correto.");
+            });
     };
-
-    // 3. Envia o e-mail usando a configuração acima
-    firebase.auth().sendPasswordResetEmail(email, actionCodeSettings)
-        .then(function() {
-            alert("Sucesso! O link de redefinição foi enviado para o seu e-mail.");
-        })
-        .catch(function(error) {
-            console.error("Erro:", error.code);
-            alert("Erro ao enviar: " + error.message);
-        });
-}
-
 
 </script>
 </body>
