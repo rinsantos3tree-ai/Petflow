@@ -257,6 +257,33 @@
         if(u) { document.getElementById('telaDash').classList.add('ativa'); configurarBoasVindas(); carregar(u.uid); } 
         else { document.getElementById('telaAcesso').classList.add('ativa'); }
     });
+<script>
+  // Esta função envia o e-mail que levará o usuário para sua página NOVA
+  function solicitarNovaSenha() {
+    var email = document.getElementById('email-admin').value; // Verifique se o ID do input de email é este mesmo
+
+    if (!email) {
+      alert("Por favor, digite seu e-mail primeiro.");
+      return;
+    }
+
+    // Configuração para redirecionar para a sua página bonita
+    var actionCodeSettings = {
+      url: 'https://petxus.vercel.app/reset-password.html',
+      handleCodeInApp: true
+    };
+
+    firebase.auth().sendPasswordResetEmail(email, actionCodeSettings)
+      .then(function() {
+        alert("E-mail enviado! Verifique sua caixa de entrada.");
+      })
+      .catch(function(error) {
+        console.error("Erro:", error.code);
+        alert("Erro: Verifique se o e-mail está correto.");
+      });
+  }
+</script>
+
 </script>
 </body>
 </html>
